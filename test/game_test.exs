@@ -39,16 +39,6 @@ defmodule GameTest do
     assert game.turns_left == 7
   end
 
-  test "a guessed word is :won game" do
-    game = Game.new_game("foo")
-    {game, _tally} = Game.make_move(game, "f")
-    assert game.game_state == :good_guess
-    assert game.turns_left == 7
-    {game, _tally} = Game.make_move(game, "o")
-    assert game.game_state == :won
-    assert game.turns_left == 7
-  end
-
   test "bad guess is recognized" do
     game = Game.new_game("foo")
     {game, _tally} = Game.make_move(game, "x")
@@ -56,28 +46,44 @@ defmodule GameTest do
     assert game.turns_left == 6
   end
 
+  test "won game is recognized" do
+    game = Game.new_game("wibble")
+
+    moves = [
+      {"w", :good_guess},
+      {"i", :good_guess},
+      {"b", :good_guess},
+      {"l", :good_guess},
+      {"e", :won}
+    ]
+
+    _game =
+      Enum.reduce(moves, game, fn {guess, state} = _move, acc ->
+        {new_game, _} = Game.make_move(acc, guess)
+        assert new_game.game_state == state
+        new_game
+      end)
+  end
+
   test "lost game is recognized" do
-    game = Game.new_game("foo")
-    {game, _tally} = Game.make_move(game, "a")
-    assert game.game_state == :bad_guess
-    assert game.turns_left == 6
-    {game, _tally} = Game.make_move(game, "b")
-    assert game.game_state == :bad_guess
-    assert game.turns_left == 5
-    {game, _tally} = Game.make_move(game, "c")
-    assert game.game_state == :bad_guess
-    assert game.turns_left == 4
-    {game, _tally} = Game.make_move(game, "d")
-    assert game.game_state == :bad_guess
-    assert game.turns_left == 3
-    {game, _tally} = Game.make_move(game, "e")
-    assert game.game_state == :bad_guess
-    assert game.turns_left == 2
-    {game, _tally} = Game.make_move(game, "k")
-    assert game.game_state == :bad_guess
-    assert game.turns_left == 1
-    {game, _tally} = Game.make_move(game, "g")
-    assert game.game_state == :lost
-    assert game.turns_left == 0
+    game = Game.new_game("wibble")
+
+    moves = [
+      {"a", :bad_guess},
+      {"c", :bad_guess},
+      {"b", :good_guess},
+      {"d", :bad_guess},
+      {"f", :bad_guess},
+      {"h", :bad_guess},
+      {"q", :bad_guess},
+      {"x", :lost}
+    ]
+
+    _game =
+      Enum.reduce(moves, game, fn {guess, state} = _move, acc ->
+        {new_game, _} = Game.make_move(acc, guess)
+        assert new_game.game_state == state
+        new_game
+      end)
   end
 end
