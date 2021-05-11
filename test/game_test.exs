@@ -1,4 +1,4 @@
-defmodule GameTest  do
+defmodule GameTest do
   use ExUnit.Case
 
   alias Hangman.Game, as: Game
@@ -8,5 +8,6 @@ defmodule GameTest  do
     assert(game.turns_left == 7)
     assert(game.game_state == :initializing)
     assert(length(game.letters) > 0)
+    assert(Enum.all?(game.letters, fn x -> x >= "a" && x <= "z" && String.length(x) == 1 end))
   end
 end
